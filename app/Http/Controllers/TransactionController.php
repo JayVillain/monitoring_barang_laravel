@@ -6,59 +6,34 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+   public function index() {
+    $transactions = Transaction::with('item')->get();
+    return view('transactions.index', compact('transactions'));
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+public function create() {
+    $items = Item::all();
+    return view('transactions.create', compact('items'));
+}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+public function store(Request $request) {
+    $request->validate([
+        'item_id'=>'required',
+        'type'=>'required',
+        'quantity'=>'required|integer',
+        'date'=>'required|date'
+    ]);
+    $transaction = Transaction::create($request->all());
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    // update stock otomatis
+    $item = $transaction->item;
+    if($transaction->type=='masuk' || $transaction->type=='kembali') {
+        $item->stock += $transaction->quantity;
+    } elseif($transaction->type=='keluar') {
+        $item->stock -= $transaction->quantity;
     }
+    $item->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    return redirect()->route('transactions.index')->with('success','Transaksi berhasil ditambahkan');
+}
 }
