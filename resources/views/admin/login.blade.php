@@ -18,12 +18,17 @@
             <p class="error">{{ session('error') }}</p>
         @endif
         <form action="{{ route('admin.login.submit') }}" method="POST">
-            @csrf
-            <label>Username</label>
-<input type="text" name="username" placeholder="Username" required>
-<label>Password</label>
-<input type="password" name="password" placeholder="Password" required>
-<button type="submit">Login</button>
+    @csrf
+    <label>Email</label>
+    <input type="email" name="email" placeholder="Email" required>
+    <label>Password</label>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+</form>
+
+@if(session('error'))
+    <p style="color:red">{{ session('error') }}</p>
+@endif
         </form>
     </div>
 </body>
