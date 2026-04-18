@@ -7,32 +7,26 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
-    // Menampilkan form login
     public function showLoginForm() {
-        return view('admin.login'); // pastikan login.blade.php ada di resources/views/admin/
+        return view('admin.login'); // view login sesuai folder
     }
 
-    // Proses login admin pakai username
     public function login(Request $request) {
-        // Validasi input
         $request->validate([
-            'username' => 'required',
+            'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        // Ambil admin berdasarkan username
-        $admin = Admin::where('username', $request->username)->first();
+        $admin = Admin::where('email', $request->email)->first();
 
-        if($admin && Hash::check($request->password, $admin->password)){
-            // Simpan session admin
+        if($admin && Hash::check($request->password, $admin->password)) {
             session(['admin_id' => $admin->id]);
             return redirect()->route('dashboard');
         }
 
-        return back()->with('error', 'Username atau password salah');
+        return back()->with('error', 'Email atau password salah');
     }
 
-    // Logout admin
     public function logout() {
         session()->forget('admin_id');
         return redirect()->route('admin.login');
